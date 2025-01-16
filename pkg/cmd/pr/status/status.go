@@ -238,9 +238,50 @@ func prSelectorForCurrentBranch(branchConfig git.BranchConfig, baseRepo ghrepo.I
 		}
 		return 0, selector, nil
 	}
-
 	return 0, prHeadRef, nil
 }
+
+// func prSelectorForCurrentBranch(branchConfig git.BranchConfig, baseRepo ghrepo.Interface, prHeadRef string, _ ghContext.Remotes) (int, string, error) {
+// 	// the branch is configured to merge a special PR head ref, which requires no disambiguation
+// 	prHeadRE := regexp.MustCompile(`^refs/pull/(\d+)/head$`)
+// 	if m := prHeadRE.FindStringSubmatch(branchConfig.MergeRef); m != nil {
+// 		prNumber, err := strconv.Atoi(m[1])
+// 		if err != nil {
+// 			return 0, "", err
+// 		}
+// 		return prNumber, prHeadRef, nil
+// 	}
+
+// 	// If the BranchConfig.Push revision has resolved, it should correctly point to the PR's selector ref
+// 	if branchConfig.Push != "" {
+// 		return 0, branchConfig.Push, nil
+// 	}
+
+// 	selector := prHeadRef
+
+// 	// Without the BranchConfig.Push revision ref, we construct the selector from the PushRemoteName determined by ReadBranchConfig
+// 	var branchOwner string
+// 	if branchConfig.PushRemoteName != "" {
+// 		selector = strings.Join([]string{branchConfig.PushRemoteName, prHeadRef}, "/")
+// 	} else if branchConfig.PushRemoteURL != nil {
+// 		r, err := ghrepo.FromURL(branchConfig.PushRemoteURL)
+// 		if err != nil {
+// 			// TODO: We aren't returning the error because we discovered that it was shadowed
+// 			// before refactoring to its current return pattern. Thus, we aren't confident
+// 			// that returning the error won't break existing behavior.
+// 			return 0, prHeadRef, nil
+// 		}
+// 		branchOwner := r.RepoOwner()
+// 		selector = strings.Join([]string{branchOwner, prHeadRef}, "/")
+// 	}
+
+// 	// prepend `OWNER:` if this branch is pushed to a fork
+// 	if !strings.EqualFold(branchOwner, baseRepo.RepoOwner()) {
+// 		selector = fmt.Sprintf("%s:%s", branchOwner, selector)
+// 	}
+
+// 	return 0, strings.Trim(selector, "/"), nil
+// }
 
 func totalApprovals(pr *api.PullRequest) int {
 	approvals := 0
